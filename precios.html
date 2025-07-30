@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PowerGym Chocoitá - Planes y Precios</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: #1a1a1a;
+        color: white;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Fondo con patrón de gym */
+      .gym-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        z-index: -2;
+      }
+
+      .gym-bg::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+            circle at 25% 25%,
+            rgba(0, 123, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 75% 75%,
+            rgba(0, 123, 255, 0.05) 0%,
+            transparent 50%
+          );
+        animation: bgMove 15s ease-in-out infinite alternate;
+      }
+
+      @keyframes bgMove {
+        0% {
+          transform: translateX(-10px) translateY(-5px);
+          opacity: 0.7;
+        }
+        100% {
+          transform: translateX(10px) translateY(5px);
+          opacity: 0.9;
+        }
+      }
+
+      /* Header */
+      .header {
+        text-align: center;
+        padding: 60px 20px 40px;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+      }
+
+      .header-subtitle {
+        color: #ccc;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        animation: fadeInDown 1s ease-out;
+      }
+
+      .header-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 30px;
+        animation: fadeInDown 1s ease-out 0.3s both;
+      }
+
+      .location-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 20px;
+        animation: fadeInUp 1s ease-out 0.6s both;
+      }
+
+      .location-btn {
+        background: #333;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .location-btn.active {
+        background: #007bff;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+      }
+
+      .location-btn:hover {
+        background: #007bff;
+        transform: translateY(-2px);
+      }
+
+      /* Plans Container */
+      .plans-container {
+        padding: 40px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      /* Plan Cards */
+      .plan-card {
+        background: #222;
+        border-radius: 15px;
+        padding: 25px 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        opacity: 0;
+        transform: translateX(-100px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .plan-card.popular {
+        background: linear-gradient(
+          135deg,
+          #007bff 0%,
+          #0056b3 50%,
+          #003d82 100%
+        );
+        transform: scale(1.05);
+        z-index: 10;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .plan-card.popular .popular-badge {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ff6b35;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      .plan-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+        line-height: 1.2;
+      }
+
+      .plan-card.popular .plan-title {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 900;
+      }
+
+      .plan-description {
+        font-size: 0.9rem;
+        color: #ccc;
+        margin-bottom: 20px;
+        line-height: 1.4;
+      }
+
+      .plan-card.popular .plan-description {
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 500;
+      }
+
+      .plan-price {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 5px;
+      }
+
+      .plan-card.popular .plan-price {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        font-weight: 900;
+      }
+
+      .plan-period {
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 20px;
+      }
+
+      .plan-card.popular .plan-period {
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 600;
+      }
+
+      .plan-features {
+        text-align: left;
+        margin-bottom: 25px;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: #ccc;
+      }
+
+      .plan-card.popular .plan-features {
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 500;
+      }
+
+      .plan-btn {
+        width: 100%;
+        background: #007bff;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .plan-btn:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+      }
+
+      .plan-card.popular .plan-btn {
+        background: white;
+        color: #007bff;
+      }
+
+      .plan-card.popular .plan-btn:hover {
+        background: #f8f9fa;
+      }
+
+      /* Special Plans */
+      .special-plans {
+        margin-top: 30px;
+      }
+
+      .special-plan {
+        background: #333;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 20px;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.5s ease;
+      }
+
+      .special-plan.rutina {
+        background: linear-gradient(
+          135deg,
+          #007bff 0%,
+          #0056b3 50%,
+          #003d82 100%
+        );
+        border: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .special-plan-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+      }
+
+      .special-plan.rutina .special-plan-title {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 900;
+      }
+
+      .special-plan-price {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .special-plan.rutina .special-plan-price {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        font-weight: 900;
+      }
+
+      .special-plan.rutina .plan-description {
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 500;
+      }
+
+      .special-plan.rutina .plan-period {
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 600;
+      }
+
+      .special-plan.rutina .plan-features {
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-weight: 500;
+      }
+
+      /* Animations */
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideInFromLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideInFromRight {
+        from {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideInFromCenter {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Social Icons */
+      .social-icons {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .social-icon {
+        width: 50px;
+        height: 50px;
+        background: #007bff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .social-icon:hover {
+        background: #0056b3;
+        transform: scale(1.1);
+      }
+
+      .whatsapp-btn {
+        background: #25d366 !important;
+        text-decoration: none;
+      }
+
+      .whatsapp-btn:hover {
+        background: #128c7e !important;
+        transform: scale(1.1);
+      }
+
+      /* Responsive */
+      @media (max-width: 1200px) {
+        .plans-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .plans-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .header-title {
+          font-size: 2rem;
+        }
+
+        .location-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .plan-card.popular {
+          transform: none;
+        }
+
+        .plan-price {
+          font-size: 2.5rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .plans-container {
+          padding: 20px 10px;
+        }
+
+        .plan-card {
+          padding: 20px 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gym-bg"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-subtitle">
+        <a
+          href="index.html"
+          style="color: #007bff; text-decoration: none; font-weight: bold"
+          >← Volver al inicio</a
+        >
+        | Iniciar el proceso
+      </div>
+      <h1 class="header-title">ELIGE TU MEJOR PLAN</h1>
+      <div class="location-buttons">
+        <button class="location-btn active">CHOCOITA GIRÓN</button>
+      </div>
+    </header>
+
+    <!-- Plans Container -->
+    <div class="plans-container">
+      <div class="plans-grid">
+        <!-- Mensualidad Sede Girón -->
+        <div class="plan-card" data-animation="left">
+          <h3 class="plan-title">MENSUALIDA<br />CHOCOITA GIRÓN</h3>
+          <p class="plan-description">
+            Utiliza todos nuestros espacios disponibles y se tu mejor versión
+          </p>
+          <div class="plan-price">
+            $60<span style="font-size: 1.5rem">MIL</span>
+          </div>
+          <div class="plan-period">Por mes</div>
+          <div class="plan-features">
+            Medios de pago<br /><br />
+            Pagos nacionales e internacionales - efectivo, transferencia, pagos
+            virtuales, tarjeta crédito y débito
+          </div>
+          <button class="plan-btn">INSCRÍBETE</button>
+        </div>
+
+        <!-- Anualidad - Most Popular -->
+        <div class="plan-card popular" data-animation="center">
+          <div class="popular-badge">Más popular</div>
+          <h3 class="plan-title">ANUALIDAD<br />Chocoita Girón - Santander</h3>
+          <div class="plan-price">
+            $480<span style="font-size: 1.5rem">MIL</span>
+          </div>
+          <div class="plan-period">El año</div>
+          <div
+            style="
+              background: rgba(0, 0, 0, 0.3);
+              color: white;
+              padding: 12px;
+              margin: 15px -20px;
+              font-weight: bold;
+              border-radius: 8px;
+              border: 2px solid rgba(255, 255, 255, 0.2);
+            "
+          >
+            2025
+          </div>
+          <div class="plan-features">
+            Utiliza todos nuestros espacios disponibles y se tu mejor versión
+            por solo
+          </div>
+          <div
+            style="
+              background: rgba(0, 0, 0, 0.4);
+              color: white;
+              padding: 15px;
+              margin: 15px -20px;
+              font-size: 1.2rem;
+              font-weight: bold;
+              border-radius: 8px;
+              border: 2px solid rgba(255, 255, 255, 0.3);
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            "
+          >
+            $40.000 POR MES
+          </div>
+          <button class="plan-btn">INSCRÍBETE</button>
+        </div>
+
+        <!-- Rutina Día -->
+        <div class="plan-card special-plan rutina" data-animation="right">
+          <h3 class="plan-title">RUTINA DÍA</h3>
+          <p class="plan-description">
+            Utiliza todos nuestros espacios disponibles y se tu mejor versión
+          </p>
+          <div class="plan-price">$7MIL</div>
+          <div class="plan-period">Por el día</div>
+          <div class="plan-features">
+            Medios de pago<br /><br />
+            Pago realizado en la sede<br /><br />
+            Carrera 1 # 4c-20<br /><br />
+            📍Barrio - Choita Calle Principal<br /><br />
+            Girón - Santander
+          </div>
+          <button class="plan-btn">TE ESPERAMOS</button>
+        </div>
+
+        <!-- Plan Pareja -->
+        <div class="plan-card" data-animation="left">
+          <h3 class="plan-title">
+            PLAN PAREJA, FAMILIA Y AMIGOS<br />SEDE GIRÓN
+          </h3>
+          <p class="plan-description">A partir de 2 usuarios</p>
+          <div class="plan-price">
+            $50<span style="font-size: 1.5rem">MIL</span>
+          </div>
+          <div class="plan-period">Mensuales</div>
+          <div class="plan-features">
+            Medios de pago<br /><br />
+            Pagos nacionales e internacionales - efectivo, transferencia, pagos
+            virtuales, tarjeta crédito y débito. Aplican condiciones y
+            restricciones
+          </div>
+          <div
+            style="
+              background: #222;
+              color: white;
+              padding: 15px;
+              margin: 15px -20px;
+              font-weight: bold;
+            "
+          >
+            PAGO DIRECTO EN SEDE
+          </div>
+          <button class="plan-btn">TE ESPERAMOS</button>
+        </div>
+
+        <!-- Semestre -->
+        <div class="plan-card" data-animation="right">
+          <h3 class="plan-title">SEMESTRE<br />GIRÓN</h3>
+          <div class="plan-price">
+            $270<span style="font-size: 1.5rem">MIL</span>
+          </div>
+          <div class="plan-period">Seis meses</div>
+          <div class="plan-features">
+            Medios de pago<br /><br />
+            Pagos nacionales e internacionales - efectivo, transferencia, pagos
+            virtuales, tarjeta crédito y débito
+          </div>
+          <div
+            style="
+              background: #007bff;
+              color: white;
+              padding: 15px;
+              margin: 15px -20px;
+              font-size: 1.2rem;
+              font-weight: bold;
+              border-radius: 8px;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            "
+          >
+            $45.000 POR MES
+          </div>
+          <button class="plan-btn">INSCRÍBETE</button>
+        </div>
+
+        <!-- Trimestre -->
+        <div class="plan-card" data-animation="left">
+          <h3 class="plan-title">TRIMESTRE<br />GIRÓN</h3>
+          <div class="plan-price">
+            $144<span style="font-size: 1.5rem">MIL</span>
+          </div>
+          <div class="plan-period">Tres meses</div>
+          <div class="plan-features">
+            Medios de pago<br /><br />
+            Pagos nacionales e internacionales - efectivo, transferencia, pagos
+            virtuales, tarjeta crédito y débito
+          </div>
+          <div
+            style="
+              background: #007bff;
+              color: white;
+              padding: 15px;
+              margin: 15px -20px;
+              font-size: 1.2rem;
+              font-weight: bold;
+              border-radius: 8px;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            "
+          >
+            $48.000 POR MES
+          </div>
+          <button class="plan-btn">INSCRÍBETE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Icons -->
+    <div class="social-icons">
+      <a
+        href="https://wa.me/57318591234"
+        target="_blank"
+        class="social-icon whatsapp-btn"
+      >
+        <img
+          src="assets/whatsapp.png"
+          alt="WhatsApp"
+          style="width: 30px; height: 30px; border-radius: 50%"
+        />
+      </a>
+      <div class="social-icon">
+        <span>📷</span>
+      </div>
+    </div>
+
+    <script>
+      // Animaciones de entrada de las tarjetas
+      function animateCards() {
+        const cards = document.querySelectorAll(".plan-card");
+
+        cards.forEach((card, index) => {
+          const animationType = card.getAttribute("data-animation");
+
+          setTimeout(() => {
+            card.style.opacity = "1";
+
+            if (animationType === "left") {
+              card.style.animation =
+                "slideInFromLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards";
+            } else if (animationType === "right") {
+              card.style.animation =
+                "slideInFromRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards";
+            } else if (animationType === "center") {
+              card.style.animation =
+                "slideInFromCenter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards";
+            }
+          }, index * 200);
+        });
+      }
+
+      // Animación de los planes especiales
+      function animateSpecialPlans() {
+        const specialPlans = document.querySelectorAll(".special-plan");
+
+        specialPlans.forEach((plan, index) => {
+          setTimeout(() => {
+            plan.style.opacity = "1";
+            plan.style.transform = "translateY(0)";
+          }, (index + 6) * 200);
+        });
+      }
+
+      // Efectos hover mejorados
+      function addHoverEffects() {
+        const cards = document.querySelectorAll(".plan-card");
+
+        cards.forEach((card) => {
+          card.addEventListener("mouseenter", () => {
+            if (!card.classList.contains("popular")) {
+              card.style.transform = "translateY(-10px) scale(1.02)";
+              card.style.boxShadow = "0 20px 40px rgba(0, 123, 255, 0.2)";
+            }
+          });
+
+          card.addEventListener("mouseleave", () => {
+            if (!card.classList.contains("popular")) {
+              card.style.transform = "translateY(0) scale(1)";
+              card.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.3)";
+            }
+          });
+        });
+      }
+
+      // Funcionalidad de botones de ubicación
+      function setupLocationButtons() {
+        const buttons = document.querySelectorAll(".location-btn");
+
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            buttons.forEach((btn) => btn.classList.remove("active"));
+            button.classList.add("active");
+          });
+        });
+      }
+
+      // Animaciones de scroll
+      function setupScrollAnimations() {
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: "0px 0px -50px 0px",
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (entry.target.classList.contains("plans-grid")) {
+                animateCards();
+              }
+            }
+          });
+        }, observerOptions);
+
+        const plansGrid = document.querySelector(".plans-grid");
+        if (plansGrid) {
+          observer.observe(plansGrid);
+        }
+      }
+
+      // Efecto de paralaje suave
+      function setupParallax() {
+        window.addEventListener("scroll", () => {
+          const scrolled = window.pageYOffset;
+          const rate = scrolled * -0.3;
+
+          const bg = document.querySelector(".gym-bg");
+          if (bg) {
+            bg.style.transform = `translateY(${rate}px)`;
+          }
+        });
+      }
+
+      // Inicializar todo cuando se carga la página
+      document.addEventListener("DOMContentLoaded", () => {
+        setupLocationButtons();
+        addHoverEffects();
+        setupScrollAnimations();
+        setupParallax();
+
+        // Iniciar animaciones después de un breve delay
+        setTimeout(() => {
+          animateCards();
+        }, 500);
+      });
+
+      // Animación adicional para botones
+      document.querySelectorAll(".plan-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+
+          // Efecto ripple
+          const ripple = document.createElement("span");
+          const rect = btn.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+
+          ripple.style.width = ripple.style.height = size + "px";
+          ripple.style.left = x + "px";
+          ripple.style.top = y + "px";
+          ripple.style.position = "absolute";
+          ripple.style.background = "rgba(255, 255, 255, 0.5)";
+          ripple.style.borderRadius = "50%";
+          ripple.style.transform = "scale(0)";
+          ripple.style.animation = "ripple 0.6s linear";
+          ripple.style.pointerEvents = "none";
+
+          btn.style.position = "relative";
+          btn.style.overflow = "hidden";
+          btn.appendChild(ripple);
+
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        });
+      });
+    </script>
+
+    <style>
+      @keyframes ripple {
+        to {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+    </style>
+  </body>
+</html>
